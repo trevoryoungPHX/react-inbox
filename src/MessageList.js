@@ -6,10 +6,13 @@ class MessageList extends Component {
   render(){
     return (
         <div>
-          {this.props.messageObj.map((message, index) => <Message
-          key={index}
-          cssID={index}
-          message={message} />)}
+          {this.props.messageList.map((item, index)=> <Message
+                  key={index}
+                  cssId={index}
+                  message={item}
+                  updateStarFunc={this.props.updateStarFunc}
+                  updateCheckFunc={this.props.updateCheckFunc}
+                />)}
         </div>
     );
   }
