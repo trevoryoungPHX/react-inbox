@@ -4,13 +4,11 @@ import React, { Component } from 'react';
 class Message extends Component {
 
   handleStar = (e) => {
-  console.log(e.target.id)
   e.preventDefault();
   this.props.updateStarFunc(e.target.id)
   }
 
   handleCheck = (e) => {
-    console.log(e.target.id)
     this.props.updateCheckFunc(e.target.id)
   }
 
@@ -39,7 +37,7 @@ class Message extends Component {
               </div>
               <div className="col-xs-11">
                 {labels}
-                <a href="#">
+                <a>
                   {this.props.message.subject}
                 </a>
               </div>

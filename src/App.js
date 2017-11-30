@@ -2,76 +2,37 @@ import React, { Component } from 'react';
 import './App.css';
 import Toolbar from './Toolbar'
 import MessageList from './MessageList'
-import Message from './Message';
-
+import axios from 'axios'
+import ComposeForm from "./ComposeForm"
 
 class App extends Component {
 
-  state = { messageList: [
-  {
-    "id": 1,
-    "subject": "You can't input the protocol without calculating the mobile RSS protocol!",
-    "read": false,
-    "starred": true,
-    "selected": false,
-    "labels": ["dev", "personal"]
-  },
-  {
-    "id": 2,
-    "subject": "connecting the system won't do anything, we need to input the mobile AI panel!",
-    "read": false,
-    "starred": false,
-    "selected": true,
-    "labels": []
-  },
-  {
-    "id": 3,
-    "subject": "Use the 1080p HTTP feed, then you can parse the cross-platform hard drive!",
-    "read": false,
-    "starred": true,
-    "selected": false,
-    "labels": ["dev"]
-  },
-  {
-    "id": 4,
-    "subject": "We need to program the primary TCP hard drive!",
-    "read": true,
-    "starred": false,
-    "selected": true,
-    "labels": []
-  },
-  {
-    "id": 5,
-    "subject": "If we override the interface, we can get to the HTTP feed through the virtual EXE interface!",
-    "read": false,
-    "starred": false,
-    "selected": false,
-    "labels": ["personal"]
-  },
-  {
-    "id": 6,
-    "subject": "We need to back up the wireless GB driver!",
-    "read": true,
-    "starred": true,
-    "selected": false,
-    "labels": []
-  },
-  {
-    "id": 7,
-    "subject": "We need to index the mobile PCI bus!",
-    "read": true,
-    "starred": false,
-    "selected": false,
-    "labels": ["dev", "personal"]
-  },
-  {
-    "id": 8,
-    "subject": "If we connect the sensor, we can get to the HDD port through the redundant IB firewall!",
-    "read": true,
-    "starred": true,
-    "selected": false,
-    "labels": []
-  }]
+  state = {
+    messageList: [],
+    showCompose: false
+  }
+
+componentDidMount = async () => {
+  let messages = await axios.get('http://localhost:8000/messages')
+  this.setState({messageList: messages.data })
+}
+
+addMessage = async (message) => {
+  let newMessage = {
+    ...message, //subject:message.subject, body: message.body, the rest
+    labels: JSON.stringify([]),
+    read: false,
+    selected: false,
+    starred: false
+  }
+  let newMessages = await axios.post(`http://localhost:8000/messages`, newMessage)
+  this.setState({ messageList: newMessages.data })
+}
+
+
+
+toggleComposeForm = () => {
+  this.setState({ showCompose: !this.state.showCompose})
 }
 
 updateStar = (index) => {
@@ -119,9 +80,9 @@ updateStar = (index) => {
    this.setState({messageList: this.state.messageList})
  }
 
- updateRemoveLabel = (labels) => {
+ updateRemoveLabel = (label) => {
    let filteredCheck = this.state.messageList.filter((message)=> message.selected)
-   filteredCheck.map((message)=> message.labels.splice(message.labels.indexOf(labels), 1))
+   filteredCheck.map((message)=> message.labels.includes(label)? message.labels.splice(message.labels.indexOf(label), 1) : message.labels)
    filteredCheck.map((message)=> message.selected = false)
    this.setState({messageList: this.state.messageList})
  }
@@ -136,11 +97,16 @@ updateStar = (index) => {
           updateDeleteFunc = {this.updateDelete}
           updateAddLabelFunc = {this.updateAddLabel}
           updateRemoveLabelFunc = {this.updateRemoveLabel}
-          messageList = {this.state.messageList}/>
+          messageList = {this.state.messageList}
+          toggleComposeForm={this.toggleComposeForm}
+          showCompose={this.state.showCompose}
+          />
+        {this.state.showCompose ? <ComposeForm addMessage={this.addMessage}/> : null}
         <MessageList
           messageList={this.state.messageList}
           updateStarFunc={this.updateStar}
-          updateCheckFunc={this.updateCheck}/>
+          updateCheckFunc={this.updateCheck}
+          />
       </div>
     );
   }
